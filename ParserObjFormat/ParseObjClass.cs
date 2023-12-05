@@ -16,7 +16,7 @@ namespace ParseObjFormat
 
         //result
         Dictionary<string, string> material_path = new Dictionary<string, string>();
-        List<int> indexes_material_array = new List<int>();
+        List<int> indices_material_array = new List<int>();
         Dictionary<string, List<Vector3>> material_vectors_dict = new Dictionary<string, List<Vector3>>();
 
         float[] result_coor_with_normal = new float[10000000];
@@ -176,7 +176,7 @@ namespace ParseObjFormat
                         if (this_material != string.Empty)
                         {
                             this_material = items[1];
-                            indexes_material_array.Add(number_item_result);
+                            indices_material_array.Add(number_item_result);
                         }
                         else
                         {
@@ -190,7 +190,7 @@ namespace ParseObjFormat
 
                 if (current_line == lines.Last())
                 {
-                    indexes_material_array.Add(number_item_result);
+                    indices_material_array.Add(number_item_result);
                 }
             }
         }
@@ -498,9 +498,9 @@ namespace ParseObjFormat
             number_item_result++;
         }
 
-        public List<int> GetIndecesMaterialArray()
+        public List<int> GetIndicesMaterialArray()
         {
-            return indexes_material_array;
+            return indices_material_array;
         }
 
         public Dictionary<string, string> GetDictionaryMaterialPath()
