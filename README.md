@@ -23,7 +23,7 @@ GL.DrawArrays(PrimitiveType.Triangles, 0, count_triangle_polygons_object * 3);
 
 texture_2.Use(TextureUnit.Texture0);
 _lightingShader.Use();
-float[] vertices_2 = vertices[array_material_indices[0]..array_material_indeces[1]];
+float[] vertices_2 = vertices[array_material_indices[0]..array_material_indices[1]];
 GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
 GL.BufferData(BufferTarget.ArrayBuffer, vertices_2.Length * sizeof(float), vertices_2, BufferUsageHint.DynamicDraw);
 GL.BindVertexArray(_vaoModel);
