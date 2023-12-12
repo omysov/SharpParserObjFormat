@@ -17,7 +17,7 @@ namespace ParseObjFormat
         //result
         Dictionary<string, string> material_path = new Dictionary<string, string>();
         List<int> indices_material_array = new List<int>();
-        Dictionary<string, List<Vector3>> material_vectors_dict = new Dictionary<string, List<Vector3>>();
+        Dictionary<string, Dictionary<string, Vector3>> material_vectors_ = new Dictionary<string, Dictionary<string, Vector3>>();
 
         float[] result_coor_with_normal = new float[10000000];
         int number_item_result = 0;
@@ -50,99 +50,141 @@ namespace ParseObjFormat
 
         private void ParseMtlFile()
         {
-            string[] nameMatWithPath = new string[2];
             List<Vector3> vectors_this_mat = new List<Vector3>();
-            bool Kd_existe = false;
+            Dictionary<string, Vector3> vectors_this_material = new Dictionary<string, Vector3>();
+
+            string name_current_material = string.Empty;
 
             foreach (string current_line_mtl in lines_mtl)
             {
 
-                if (current_line_mtl.StartsWith("newmtl"))
+                if (current_line_mtl == string.Empty)
                 {
-                    if (nameMatWithPath[0] != null)
+                    if (name_current_material == string.Empty)
                     {
-                        material_path.Add(nameMatWithPath[0], "base");
-                        nameMatWithPath = new string[2];
-
-                        string current_material = string.Empty;
-                        for (int ch = 7; ch < current_line_mtl.Length; ch++)
-                        {
-                            current_material += current_line_mtl[ch];
-                        }
-
-                        nameMatWithPath[0] = current_material;
+                        continue;
                     }
                     else
                     {
-                        string current_material = string.Empty;
-                        for (int ch = 7; ch < current_line_mtl.Length; ch++)
-                        {
-                            current_material += current_line_mtl[ch];
-                        }
-
-                        nameMatWithPath[0] = current_material;
+                        material_vectors_.Add(name_current_material, vectors_this_material);
+                        name_current_material = string.Empty;
+                        vectors_this_material = new Dictionary<string, Vector3>();
                     }
+                }
+
+
+                if (current_line_mtl.StartsWith("newmtl"))
+                {
+                    string name_material = StringNewmtl(current_line_mtl);
+
+                    material_path.Add(name_material, string.Empty);
+                    name_current_material = name_material;
                 };
 
                 if (current_line_mtl.StartsWith("Ka"))
                 {
                     string[] items = current_line_mtl.Split(' ');
 
-
-                    vectors_this_mat.Add(new Vector3(
-                            float.Parse(items[1], CultureInfo.InvariantCulture),
-                            float.Parse(items[2], CultureInfo.InvariantCulture),
-                            float.Parse(items[3], CultureInfo.InvariantCulture)));
+                    StringKa(current_line_mtl, vectors_this_material);
                 }
 
                 if (current_line_mtl.StartsWith("Kd"))
                 {
                     string[] items = current_line_mtl.Split(' ');
 
-                    Kd_existe = true;
-                    vectors_this_mat.Add(new Vector3(
-                            float.Parse(items[1], CultureInfo.InvariantCulture),
-                            float.Parse(items[2], CultureInfo.InvariantCulture),
-                            float.Parse(items[3], CultureInfo.InvariantCulture)));
+                    StringKd(current_line_mtl, vectors_this_material);
                 }
 
                 if (current_line_mtl.StartsWith("Ks"))
                 {
                     string[] items = current_line_mtl.Split(' ');
 
-
-                    vectors_this_mat.Add(new Vector3(
-                            float.Parse(items[1], CultureInfo.InvariantCulture),
-                            float.Parse(items[2], CultureInfo.InvariantCulture),
-                            float.Parse(items[3], CultureInfo.InvariantCulture)));
+                    StringKs(current_line_mtl, vectors_this_material);
                 }
 
                 if (current_line_mtl.StartsWith("Ke"))
                 {
                     string[] items = current_line_mtl.Split(' ');
 
+                    StringKe(current_line_mtl, vectors_this_material);
 
-                    vectors_this_mat.Add(new Vector3(
-                            float.Parse(items[1], CultureInfo.InvariantCulture),
-                            float.Parse(items[2], CultureInfo.InvariantCulture),
-                            float.Parse(items[3], CultureInfo.InvariantCulture)));
                 }
 
                 if (current_line_mtl.StartsWith("map_Kd"))
                 {
-                    string current_path = string.Empty;
-                    for (int ch = 7; ch < current_line_mtl.Length; ch++)
-                    {
-                        current_path += current_line_mtl[ch];
-                    }
-                    nameMatWithPath[1] = current_path;
-                    material_path.Add(nameMatWithPath[0], nameMatWithPath[1]);
-                    material_vectors_dict.Add(nameMatWithPath[0], vectors_this_mat);
+                    StringMapKd(current_line_mtl, name_current_material);
+                }
 
-                    nameMatWithPath = new string[2];
-
+                //check last line
+                if (current_line_mtl == lines_mtl.Last())
+                {
+                    material_vectors_.Add(name_current_material, vectors_this_material);
                 }
             }
+        }
+
+        private string StringNewmtl(string current_line_mtl)
+        {
+            string current_material = string.Empty;
+            for (int ch = 7; ch < current_line_mtl.Length; ch++)
+            {
+                current_material += current_line_mtl[ch];
+            }
+            return current_material;
+        }
+
+        private void StringKa(string current_line_mtl, Dictionary<string, Vector3> vectors_this_material)
+        {
+            string[] items = current_line_mtl.Split(' ');
+
+            //dictionary
+            vectors_this_material.Add("Ka", new Vector3(
+                    float.Parse(items[1], CultureInfo.InvariantCulture),
+                    float.Parse(items[2], CultureInfo.InvariantCulture),
+                    float.Parse(items[3], CultureInfo.InvariantCulture)));
+        }
+
+        private void StringKd(string current_line_mtl, Dictionary<string, Vector3> vectors_this_material)
+        {
+            string[] items = current_line_mtl.Split(' ');
+
+            //dictionary
+            vectors_this_material.Add("Kd", new Vector3(
+                    float.Parse(items[1], CultureInfo.InvariantCulture),
+                    float.Parse(items[2], CultureInfo.InvariantCulture),
+                    float.Parse(items[3], CultureInfo.InvariantCulture)));
+        }
+
+        private void StringKs(string current_line_mtl, Dictionary<string, Vector3> vectors_this_material)
+        {
+            string[] items = current_line_mtl.Split(' ');
+
+            //dictionary
+            vectors_this_material.Add("Ks", new Vector3(
+                    float.Parse(items[1], CultureInfo.InvariantCulture),
+                    float.Parse(items[2], CultureInfo.InvariantCulture),
+                    float.Parse(items[3], CultureInfo.InvariantCulture)));
+        }
+
+        private void StringKe(string current_line_mtl, Dictionary<string, Vector3> vectors_this_material)
+        {
+            string[] items = current_line_mtl.Split(' ');
+
+            //dictionary
+            vectors_this_material.Add("Ke", new Vector3(
+                    float.Parse(items[1], CultureInfo.InvariantCulture),
+                    float.Parse(items[2], CultureInfo.InvariantCulture),
+                    float.Parse(items[3], CultureInfo.InvariantCulture)));
+        }
+
+        private void StringMapKd(string current_line_mtl, string name_current_material)
+        {
+            string current_path = string.Empty;
+            for (int ch = 7; ch < current_line_mtl.Length; ch++)
+            {
+                current_path += current_line_mtl[ch];
+            }
+            material_path[name_current_material] = current_path;
         }
 
         private void ParseObjFile()
@@ -506,6 +548,11 @@ namespace ParseObjFormat
         public Dictionary<string, string> GetDictionaryMaterialPath()
         {
             return material_path;
+        }
+
+        public Dictionary<string, Dictionary<string, Vector3>> GetDictionaryMaterialVectors3()
+        {
+            return material_vectors_;
         }
 
         public float[] GetResultFloatArray()
