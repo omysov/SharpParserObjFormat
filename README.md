@@ -17,6 +17,7 @@ texture_2 = Texture.LoadFromFile(dict_material["Material_2"]);
 //System.Numeric format vector
 Dictionary<string, Dictionary<string, Vector3>> material_vectors = parse.GetDictionaryMaterialVectors3();
 Vector3 ka_vector = material_vectores_dict["Material"]["Ka"];
+Vector3 ka_vector_2 = material_vectores_dict["Material_2"]["Ka"];
 ```
 
 ```C#
