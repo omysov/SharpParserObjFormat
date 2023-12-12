@@ -5,6 +5,7 @@ parse.ParseObj("model.obj", "model.mtl");
 
 List<int> array_material_indices = parse.GetIndicesMaterialArray();
 Dictionary<string, string> dict_material = parse.GetDictionaryMaterialPath();
+Dictionary<string, Dictionary<string, Vector3>> material_vectors = GetDictionaryMaterialVectors3();
 float[] vertices = parse.GetResultFloatArray();
 count_triangle_polygons_object = parse.triangle_polygon;
 ```
@@ -12,6 +13,12 @@ count_triangle_polygons_object = parse.triangle_polygon;
 texture_1 = Texture.LoadFromFile(dict_material["Material"]);
 texture_2 = Texture.LoadFromFile(dict_material["Material_2"]);
 ```
+```C#
+//System.Numeric format vector
+Dictionary<string, Dictionary<string, Vector3>> material_vectors = parse.GetDictionaryMaterialVectors3();
+Vector3 ka_vector = material_vectores_dict["Material"]["Ka"];
+```
+
 ```C#
 texture_1.Use(TextureUnit.Texture0);
 _lightingShader.Use();
